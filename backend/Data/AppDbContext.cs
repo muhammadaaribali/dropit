@@ -9,6 +9,5 @@ public class AppDbContext : DbContext
     {
         
     }
-
     public DbSet<ShareItem> ShareItems { get; set;}
 }
