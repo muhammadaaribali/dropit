@@ -1,10 +1,11 @@
+using backend.Enums;
 namespace backend.Models;
 
 public class ShareItem
 {
     public int Id { get; set;}
     public string Code { get; set;}= string.Empty;
-    public string Type { get; set;}= string.Empty;
+    public ShareType Type { get; set;}
     public string OriginalName {get; set;} = string.Empty;
     public string? S3Key {get;set;}
     public string? LinkUrl {get;set;}
