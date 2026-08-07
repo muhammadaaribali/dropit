@@ -2,6 +2,7 @@ using backend.Data;
 using backend.DTOs;
 using backend.Models;
 using backend.Services;
+using backend.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers;
@@ -21,5 +22,37 @@ public class ShareController : ControllerBase
         _s3Service = s3Service;
         _context = context;
         _codeGenerator = codeGenerator;
+    }
+
+    [HttpPost("upload")]
+    public async Task<ActionResult<UploadFileResponseDto>> Upload(IFormFile file)
+    {
+        if(file==null || file.Length == 0)
+        {
+            return BadRequest("No file uploaded.");
+        }
+
+        var code = await _codeGenerator.GenerateUniqueCodeAsync();
+        var objectKey= await _s3Service.UploadFileAsync(file);
+
+        var shareItem = new ShareItem
+        {
+            Code = code,
+            Type = file.ContentType.StartsWith("image/") ? Enums.ShareType.Image : Enums.ShareType.File,
+
+            OriginalName =file.FileName,
+            S3Key = objectKey,
+            MimeType = file.ContentType,
+            Size= file.Length
+
+        };
+
+        _context.ShareItems.Add(shareItem);
+        await _context.SaveChangesAsync();
+
+        return Ok(new UploadFileResponseDto
+        {
+            Code = code
+        });
     }
 }
