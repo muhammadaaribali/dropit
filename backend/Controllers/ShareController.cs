@@ -4,6 +4,7 @@ using backend.Models;
 using backend.Services;
 using backend.Enums;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Controllers;
 
@@ -55,4 +56,31 @@ public class ShareController : ControllerBase
             Code = code
         });
     }
+
+    [HttpGet("{code}")]
+    public async Task<ActionResult<ShareItemResponseDto>> GetByCode(string code)
+    {
+         var shareItem = await _context.ShareItems.FirstOrDefaultAsync(x=>x.Code==code);
+
+        if (shareItem == null)
+        {
+            return NotFound("Share code not found");
+        }
+        if(shareItem.ExpiresAt <= DateTime.UtcNow)
+        {
+            return BadRequest("Share has Expired");
+        }
+
+        var response = new ShareItemResponseDto
+        {
+            Code=shareItem.Code,
+            Type=shareItem.Type.ToString(),
+            OriginalName=shareItem.OriginalName,
+            MimeType=shareItem.MimeType,
+            Size=shareItem.Size
+        };
+
+        return Ok(response);
+    }
+
 }
