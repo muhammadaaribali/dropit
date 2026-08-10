@@ -84,5 +84,46 @@ public class ShareController : ControllerBase
 
         return Ok(response);
     }
+    [HttpPost("share-link")]
+    public async Task<ActionResult<ShareItemResponseDto>> ShareLink(ShareLinkRequestDto request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Url))
+        {
+            return BadRequest("URL is required.");
+        }
+        if(!Uri.TryCreate(request.Url, UriKind.Absolute, out var uri))
+        {
+            return BadRequest("Invalid URL");
+        }
+
+        //we are turing our url into c# object
+        //When you turn it into a Uri object, C# can understand the different parts of the URL instead of treating it as random text.
+        /*
+        https://google.com/products?id=10
+        │      │          │        │
+        │      │          │        └── query
+        │      │          └─────────── path
+        │      └────────────────────── host
+        └───────────────────────────── scheme
+        */
+
+        var code = await _codeGenerator.GenerateUniqueCodeAsync();
+
+        var shareItem = new ShareItem
+        {
+            Code = code,
+            Type = Enums.ShareType.Link,
+            LinkUrl = uri.ToString()
+            
+        };
+
+        _context.ShareItems.Add(shareItem);
+        await _context.SaveChangesAsync();
+
+        return Ok(new UploadFileResponseDto
+        {
+            Code =code
+        });
+    }
 
 }
