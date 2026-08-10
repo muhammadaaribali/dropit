@@ -70,6 +70,7 @@ public class ShareController : ControllerBase
         {
             return BadRequest("Share has Expired");
         }
+        var downloadUrl= shareItem.S3Key != null ? _s3Service.GenerateDownloadUrl(shareItem.S3Key):null;
 
         var response = new ShareItemResponseDto
         {

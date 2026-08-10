@@ -33,9 +33,23 @@ public class S3Service : IS3Service
 
         return objectKey;
     }
+
+    public string GenerateDownloadUrl(string objectKey)
+        {
+                var request = new GetPreSignedUrlRequest
+                {
+                        BucketName= _bucketName,
+                        Key= objectKey,
+                        Expires=DateTime.UtcNow.AddMinutes(30),
+                        Verb=HttpVerb.GET
+                
+                };
+
+                return _s3Client.GetPreSignedURL(request);
+        }
 }
 
-/*
+/* 
 User selects cat.png
         │
         ▼
