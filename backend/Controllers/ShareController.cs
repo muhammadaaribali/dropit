@@ -72,6 +72,9 @@ public class ShareController : ControllerBase
         }
         var downloadUrl= shareItem.S3Key != null ? _s3Service.GenerateDownloadUrl(shareItem.S3Key):null;
 
+        shareItem.Downloads++;
+        await _context.SaveChangesAsync();
+
         var response = new ShareItemResponseDto
         {
             Code=shareItem.Code,
@@ -79,7 +82,8 @@ public class ShareController : ControllerBase
             OriginalName=shareItem.OriginalName,
             MimeType=shareItem.MimeType,
             Size=shareItem.Size,
-            DownloadUrl=downloadUrl
+            DownloadUrl=downloadUrl,
+            LinkUrl=shareItem.LinkUrl
         };
 
         return Ok(response);
@@ -117,6 +121,8 @@ public class ShareController : ControllerBase
             
         };
 
+        //URL = an address that tells you where/how to access a resource; URI = the broader concept of a unique identifier for a resource (a URL is a type of URI).
+
         _context.ShareItems.Add(shareItem);
         await _context.SaveChangesAsync();
 
@@ -125,5 +131,4 @@ public class ShareController : ControllerBase
             Code =code
         });
     }
-
 }
