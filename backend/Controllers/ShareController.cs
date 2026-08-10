@@ -78,7 +78,8 @@ public class ShareController : ControllerBase
             Type=shareItem.Type.ToString(),
             OriginalName=shareItem.OriginalName,
             MimeType=shareItem.MimeType,
-            Size=shareItem.Size
+            Size=shareItem.Size,
+            DownloadUrl=downloadUrl
         };
 
         return Ok(response);
