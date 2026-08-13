@@ -4,7 +4,7 @@ import Receive from "./pages/Receive";
 
 function App(){
 
-  const [activeTab, setActiveTab]= useState("Send");
+  const [activeTab, setActiveTab]= useState("send");
 
   return(
     <div>
@@ -13,7 +13,7 @@ function App(){
         Send
         </button>
 
-        <button onClick={()=> setActiveTab("Receive")}>
+        <button onClick={()=> setActiveTab("receive")}>
           Receive
         </button>
       </nav>
