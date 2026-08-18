@@ -42,6 +42,7 @@ function Receive(){
                 placeholder="Enter 6-digit code"
                 value={code}
                 onChange={(event)=> setCode(event.target.value)}
+
             />
 
             <button
@@ -66,6 +67,7 @@ function Receive(){
                         Type: {share.type}
                     </p>
 
+                    //ternary operator
                     {share.type === "Link" ?(
                         <a
                             href={share.linkUrl}
@@ -90,3 +92,19 @@ function Receive(){
         </div>
     );
 }
+
+/*
+You type 1
+   ↓
+onChange runs
+   ↓
+event.target.value = "1"
+   ↓
+setCode("1")
+   ↓
+React updates code state
+   ↓
+Receive component re-renders
+   ↓
+code is now "1"
+*/
