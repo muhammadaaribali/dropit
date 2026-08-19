@@ -6,6 +6,8 @@ function Send(){
     const [code, setCode]= useState("");
     const [loading, setLoading]=useState(false);
     const [error, setError]= useState("");
+    const [mode,setMode]= useState("file");
+    const [url, setUrl]= useState("");
 
     const handleFileChange= (event)=> {
 
@@ -21,8 +23,14 @@ function Send(){
     };
 
     const handleUpload = async()=>{
-        if(!file){
+
+        if(mode === "file"&& !file){
             setError("Please select a file");
+            return;
+        }
+
+        if(mode === "link"&& !url.trim()){
+            setError("Please enter a URL");
             return;
         }
 
@@ -31,13 +39,25 @@ function Send(){
         setCode("");
 
         try{
-            const formData= new FormData();
+            if(mode === "file"){
 
-            formData.append("file",file);
+                const formData= new FormData();
 
-            const response = await api.post("/share/upload",formData);
+                formData.append("file",file);
 
-            setCode(response.data.code);
+                const response = await api.post("/share/upload",formData);
+
+                setCode(response.data.code);
+            } else{
+                const response = await api.post("/share/share-link",
+                    {
+                        url:url
+                    }
+                );
+
+                setCode(response.data.code);
+            }
+           
         } catch(error){
             console.error(error);
             setError("Upload failed");
@@ -49,35 +69,73 @@ function Send(){
     return (
         <div>
             <h1>Send</h1>
-            <input 
-            type="file"
-            onChange={handleFileChange}
-            />
+            <div>
+                <button
+                    onClick={()=>{
+                        setMode("file");
+                        setError("");
+                        setCode("");
+                    }}
+                >
+                    File
+                </button>
 
-            {file && (
-                <p>
-                    Selected: {file.name}
-                </p>
+                <button
+                    onClick={()=>{
+                        setMode("link");
+                        setError("");
+                        setCode("");
+                    }}
+                >
+                    Link
+                </button>
+            </div>
+
+            {mode === "file" && (
+                <div>
+                    <input
+                        type="file"
+                        onChange={handleFileChange}
+                    />
+
+                    {file && (
+                        <p>
+                            Selected: {file.name}
+                        </p>
+                    )}
+                </div>
+            )}
+
+            {/* conditional rendring */}
+            {mode === "link" && (
+                <div>
+                    <input
+                        type="url"
+                        placeholder="Enter URL"
+                        value={url}
+                        onChange={(event)=> setUrl(event.target.value)}
+                    />
+                </div>
             )}
 
             <button
                 onClick={handleUpload}
                 disabled={loading}
-                >
-                    {loading ? "Uploading...": "Generate Code"}
-                </button>
+            >
+                {loading ? "Generating...":"Generate Code"}
+            </button>
 
-                {code && (
-                    <div>
-                        <h2>Your Code</h2>
-                        <p>{code}</p>
-                    </div>
-                )}
+            {code && (
+                <div>
+                    <h2>Your Code</h2>
+                    <p>{code}</p>
+                </div>
+            )}
 
-                {error && (
-                    <p>{error}</p>
-                )}
-            
+            {error && (
+                <p>{error}</p>
+            )}
+
         </div>
     );
 
