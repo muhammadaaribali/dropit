@@ -67,7 +67,7 @@ function Receive(){
                         Type: {share.type}
                     </p>
 
-                    //ternary operator
+                    {/* ternary operator */}
                     {share.type === "Link" ?(
                         <a
                             href={share.linkUrl}
@@ -92,6 +92,8 @@ function Receive(){
         </div>
     );
 }
+
+export default Receive;
 
 /*
 You type 1
