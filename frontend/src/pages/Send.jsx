@@ -8,6 +8,7 @@ function Send(){
     const [error, setError]= useState("");
     const [mode,setMode]= useState("file");
     const [url, setUrl]= useState("");
+    const [copied, setCopied]=useState(false);
 
     const handleFileChange= (event)=> {
 
@@ -20,6 +21,19 @@ function Send(){
         setFile(selectedFile);
         setCode("");
         setError("");
+    };
+
+    const handleCopyCode= async()=>{
+        try{
+            await navigator.clipboard.writeText(code);
+            setCopied(true);
+
+            setTimeout(()=>{
+                setCopied(false);
+            },2000);
+        }catch(error){
+            console.error(error);
+        }
     };
 
     const handleUpload = async()=>{
@@ -129,6 +143,12 @@ function Send(){
                 <div>
                     <h2>Your Code</h2>
                     <p>{code}</p>
+
+                    <button
+                        onClick={handleCopyCode}
+                    >
+                        {copied ? "✓ Copied!" : "Copy Code"}
+                    </button>
                 </div>
             )}
 
