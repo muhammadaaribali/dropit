@@ -1,5 +1,6 @@
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import api from "../services/api";
+import liquidGlass from "../lib/liquid-glass";
 
 function Send(){
     const [file, setFile]= useState(null);
@@ -9,6 +10,7 @@ function Send(){
     const [mode,setMode]= useState("file");
     const [url, setUrl]= useState("");
     const [copied, setCopied]=useState(false);
+
 
     const handleFileChange= (event)=> {
 

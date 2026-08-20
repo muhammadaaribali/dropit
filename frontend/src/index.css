@@ -109,3 +109,23 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+.glass-panel {
+    width: 100%;
+    max-width: 520px;
+    padding: 32px;
+
+    border-radius: 28px;
+
+    background: linear-gradient(
+        180deg,
+        rgba(14, 14, 22, 0.18),
+        rgba(14, 14, 22, 0.32)
+    );
+
+    box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.45),
+        inset 0 1px 1px rgba(255, 255, 255, 0.5),
+        inset 0 -8px 20px rgba(255, 255, 255, 0.06),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.13);
+}
