@@ -1,6 +1,5 @@
 import {useState, useEffect} from "react";
 import api from "../services/api";
-import liquidGlass from "../lib/liquid-glass";
 
 function Send(){
     const [file, setFile]= useState(null);
@@ -82,80 +81,230 @@ function Send(){
         }
     };
 
-    return (
-        <div>
-            <h1>Send</h1>
-            <div>
+   return (
+        <div className="send-container">
+
+            {/* HEADER */}
+
+            <div className="send-header">
+
+                <div className="send-icon-large">
+                    ↑
+                </div>
+
+                <div>
+
+                    <h1>Send files</h1>
+
+                    <p>
+                        Upload a file or share a link with someone
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            {/* MODE SWITCH */}
+
+            <div className="mode-switch">
+
                 <button
-                    onClick={()=>{
+                    className={mode === "file" ? "mode-button active" : "mode-button"}
+                    onClick={() => {
                         setMode("file");
                         setError("");
                         setCode("");
                     }}
                 >
+                    <span>□</span>
                     File
                 </button>
 
+
                 <button
-                    onClick={()=>{
+                    className={mode === "link" ? "mode-button active" : "mode-button"}
+                    onClick={() => {
                         setMode("link");
                         setError("");
                         setCode("");
                     }}
                 >
+                    <span>↗</span>
                     Link
                 </button>
+
             </div>
 
-            {mode === "file" && (
-                <div>
-                    <input
-                        type="file"
-                        onChange={handleFileChange}
-                    />
 
-                    {file && (
-                        <p>
-                            Selected: {file.name}
-                        </p>
+            {/* MAIN FORM */}
+
+            <div className="send-form">
+
+                {mode === "file" && (
+
+                    <div className="file-upload-area">
+
+                        <input
+                            id="file-input"
+                            type="file"
+                            onChange={handleFileChange}
+                        />
+
+                        <label
+                            htmlFor="file-input"
+                            className="file-drop-zone"
+                        >
+
+                            <div className="upload-icon">
+                                ↑
+                            </div>
+
+                            <h3>
+                                {file
+                                    ? file.name
+                                    : "Choose a file"}
+                            </h3>
+
+                            <p>
+                                {file
+                                    ? `${(file.size / 1024).toFixed(1)} KB`
+                                    : "Click here to browse your files"}
+                            </p>
+
+                            <span className="browse-text">
+                                Browse files
+                            </span>
+
+                        </label>
+
+                    </div>
+
+                )}
+
+
+                {mode === "link" && (
+
+                    <div className="link-area">
+
+                        <label>
+                            Share URL
+                        </label>
+
+                        <div className="url-input-wrapper">
+
+                            <span className="url-icon">
+                                ↗
+                            </span>
+
+                            <input
+                                type="url"
+                                placeholder="https://example.com"
+                                value={url}
+                                onChange={(event) =>
+                                    setUrl(event.target.value)
+                                }
+                            />
+
+                        </div>
+
+                    </div>
+
+                )}
+
+
+                {/* GENERATE BUTTON */}
+
+                <button
+                    className="generate-button"
+                    onClick={handleUpload}
+                    disabled={loading}
+                >
+
+                    {loading ? (
+                        <>
+                            <span className="loading-dot"></span>
+                            Generating...
+                        </>
+                    ) : (
+                        <>
+                            Generate code
+                            <span>→</span>
+                        </>
                     )}
-                </div>
-            )}
 
-            {/* conditional rendring */}
-            {mode === "link" && (
-                <div>
-                    <input
-                        type="url"
-                        placeholder="Enter URL"
-                        value={url}
-                        onChange={(event)=> setUrl(event.target.value)}
-                    />
-                </div>
-            )}
+                </button>
 
-            <button
-                onClick={handleUpload}
-                disabled={loading}
-            >
-                {loading ? "Generating...":"Generate Code"}
-            </button>
+
+                {/* ERROR */}
+
+                {error && (
+
+                    <div className="send-error">
+
+                        <span>!</span>
+
+                        {error}
+
+                    </div>
+
+                )}
+
+            </div>
+
+
+            {/* GENERATED CODE */}
 
             {code && (
-                <div>
-                    <h2>Your Code</h2>
-                    <p>{code}</p>
+
+                <div className="code-result">
+
+                    <div className="code-result-header">
+
+                        <div>
+
+                            <span className="code-label">
+                                SHARE READY
+                            </span>
+
+                            <h2>
+                                Give this code to the receiver
+                            </h2>
+
+                        </div>
+
+                        <div className="success-icon">
+                            ✓
+                        </div>
+
+                    </div>
+
+
+                    <div className="generated-code">
+                        {code}
+                    </div>
+
 
                     <button
+                        className="copy-button"
                         onClick={handleCopyCode}
                     >
-                        {copied ? "✓ Copied!" : "Copy Code"}
-                    </button>
-                </div>
-            )}
 
-            {error && (
-                <p>{error}</p>
+                        {copied ? (
+                            <>
+                                ✓ Copied
+                            </>
+                        ) : (
+                            <>
+                                Copy code
+                                <span>⧉</span>
+                            </>
+                        )}
+
+                    </button>
+
+                </div>
+
             )}
 
         </div>
