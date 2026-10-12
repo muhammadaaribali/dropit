@@ -9,6 +9,7 @@ Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("ReactPolicy", policy =>
@@ -16,31 +17,41 @@ builder.Services.AddCors(options =>
         var frontendUrl = builder.Configuration["FRONTEND_URL"]
             ?? (builder.Environment.IsDevelopment()
                 ? "http://localhost:5173"
-                : throw new InvalidOperationException("FRONTEND_URL is missing."));
+                : throw new InvalidOperationException(
+                    "FRONTEND_URL is missing."
+                ));
 
-        if (string.IsNullOrWhiteSpace(frontendUrl))
+        var allowedOrigins = new[]
         {
-            throw new InvalidOperationException("FRONTEND_URL is missing.");
-        }
+            frontendUrl,
+            "http://localhost:5173",
+            "https://dropitapp.tech",
+            "https://www.dropitapp.tech"
+        };
 
         policy
-            .WithOrigins(frontendUrl)
+            .WithOrigins(allowedOrigins.Distinct().ToArray())
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
 });
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Register controllers and Swagger
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddControllers();
-
+// Configure PostgreSQL database
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    )
+);
 
+// Register application services
 builder.Services.AddScoped<ICodeGenerator, CodeGenerator>();
+builder.Services.AddScoped<IS3Service, S3Service>();
 
+// Configure AWS S3
 builder.Services.AddSingleton<IAmazonS3>(sp =>
 {
     var accessKey = Environment.GetEnvironmentVariable("AWS_ACCESS_KEY")
@@ -59,21 +70,22 @@ builder.Services.AddSingleton<IAmazonS3>(sp =>
     );
 });
 
-builder.Services.AddScoped<IS3Service, S3Service>();
-
 var app = builder.Build();
 
+// Configure the HTTP request pipeline
 app.UseCors("ReactPolicy");
 
-// Configure the HTTP request pipeline.
+// Enable Swagger in development
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
+// HTTPS is terminated by ngrok in this deployment setup.
+// app.UseHttpsRedirection();
 
+// Map API controllers
 app.MapControllers();
 
 app.Run();
