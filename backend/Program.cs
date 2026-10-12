@@ -13,8 +13,18 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("ReactPolicy", policy =>
     {
+        var frontendUrl = builder.Configuration["FRONTEND_URL"]
+            ?? (builder.Environment.IsDevelopment()
+                ? "http://localhost:5173"
+                : throw new InvalidOperationException("FRONTEND_URL is missing."));
+
+        if (string.IsNullOrWhiteSpace(frontendUrl))
+        {
+            throw new InvalidOperationException("FRONTEND_URL is missing.");
+        }
+
         policy
-            .WithOrigins("http://localhost:5173")
+            .WithOrigins(frontendUrl)
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
